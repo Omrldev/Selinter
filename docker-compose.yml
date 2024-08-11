@@ -1,0 +1,20 @@
+version: '3.4'
+
+services:
+  salesservice:
+    image: ${DOCKER_REGISTRY-}salesservice
+    build:
+      context: .
+      dockerfile: SalesService/Dockerfile
+
+  postgres:
+    image: postgres
+    environment:
+    - POSTGRES_PASSWORD=pgxledejos
+    ports:
+    - 5432:5432
+    volumes:
+    - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
