@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SalesService.Data.DbContexts;
@@ -22,16 +23,27 @@ namespace SalesService.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<SaleDto>>> GetAllSales()
+        public async Task<ActionResult<List<SaleDto>>> GetAllSales(string date)
         {
-            var sales = await Entities
+            var query = Entities.OrderBy(x => x.Product.Brand).AsQueryable();
+
+            if(!string.IsNullOrWhiteSpace(date))
+            {
+                query = query.Where(x => x.Updated.CompareTo(DateTime.Parse(date).ToUniversalTime()) > 0);
+            }
+
+            return await query.ProjectTo<SaleDto>(_mapper.ConfigurationProvider)
+                .ToListAsync();
+
+            /*var sales = await Entities
                 .Include(x => x.Product)
                 .OrderBy(x => x.Product.Brand)
                 .ToListAsync();
 
             return _mapper.Map<List<SaleDto>>(sales);
 
-            /*var results = sales.Select(x => new SaleDto()
+            // manually mapping
+            var results = sales.Select(x => new SaleDto()
             {
                 Id = x.Id,
             }).ToList();

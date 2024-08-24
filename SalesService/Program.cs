@@ -1,6 +1,9 @@
 using Microsoft.EntityFrameworkCore;
+using Polly;
+using Polly.Extensions.Http;
 using SalesService.Data;
 using SalesService.Data.DbContexts;
+using System.Net;
 
 var builder = WebApplication.CreateBuilder(args);
 
