@@ -1,3 +1,4 @@
+using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Polly;
 using Polly.Extensions.Http;
@@ -16,6 +17,14 @@ var connection = builder.Configuration.GetConnectionString(connectionName);
 builder.Services.AddDbContext<SalesDbContext>(opt => opt.UseNpgsql(connection));
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
+builder.Services.AddMassTransit(x =>
+{
+    x.UsingRabbitMq((context, config) =>
+    {
+        config.ConfigureEndpoints(context);
+    });
+});
 
 var app = builder.Build();
 

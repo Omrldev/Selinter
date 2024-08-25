@@ -6,6 +6,7 @@ using SearchService.Data;
 using SearchService.Dto;
 using SearchService.Service;
 using System.Net;
+using MassTransit;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +14,14 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddHttpClient<SalesSvcHttpClient>().AddPolicyHandler(GetPolicy());
+
+builder.Services.AddMassTransit(x =>
+{
+    x.UsingRabbitMq((context, config) =>
+    {
+        config.ConfigureEndpoints(context);
+    });
+});
 
 var app = builder.Build();
 
