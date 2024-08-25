@@ -7,16 +7,22 @@ using SearchService.Dto;
 using SearchService.Service;
 using System.Net;
 using MassTransit;
+using SearchService.Consumers;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
 builder.Services.AddControllers();
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddHttpClient<SalesSvcHttpClient>().AddPolicyHandler(GetPolicy());
 
 builder.Services.AddMassTransit(x =>
 {
+    x.AddConsumersFromNamespaceContaining<SalesCreatedConsumer>();
+
+    x.SetEndpointNameFormatter(new KebabCaseEndpointNameFormatter("search", false));
+
     x.UsingRabbitMq((context, config) =>
     {
         config.ConfigureEndpoints(context);
