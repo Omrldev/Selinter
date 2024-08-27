@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using Contracts;
+using MassTransit;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SalesService.Data.DbContexts;
@@ -14,12 +16,15 @@ namespace SalesService.Controllers
     {
         private readonly SalesDbContext _context;
         private readonly IMapper _mapper;
+        private readonly IPublishEndpoint _publishEndpoint;
         public DbSet<Sale>  Entities => _context.Set<Sale>();
 
-        public SalesControler(SalesDbContext context, IMapper mapper)
+        public SalesControler(SalesDbContext context, IMapper mapper, 
+            IPublishEndpoint publishEndpoint)
         {
             _context = context;
             _mapper = mapper;
+            _publishEndpoint = publishEndpoint;
         }
 
         [HttpGet]
@@ -73,6 +78,10 @@ namespace SalesService.Controllers
 
             Entities.Add(sale);
 
+            var newSale = _mapper.Map<SaleDto>(sale);
+
+            await _publishEndpoint.Publish(_mapper.Map<SalesCreated>(newSale));
+
             var result = await _context.SaveChangesAsync() > 0;
 
             if(!result)
@@ -80,7 +89,7 @@ namespace SalesService.Controllers
                 return BadRequest("No se pudieron guardar los cambios en la base de datos");
             }
 
-            return CreatedAtAction(nameof(GetSalesById), new {sale.Id}, _mapper.Map<SaleDto>(sale));
+            return CreatedAtAction(nameof(GetSalesById), new {sale.Id}, newSale);
         }
 
         [HttpPut("{id}")]

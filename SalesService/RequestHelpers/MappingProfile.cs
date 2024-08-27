@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Contracts;
 using SalesService.Dtos;
 using SalesService.Enitities;
 
@@ -13,6 +14,7 @@ namespace SalesService.RequestHelpers
             CreateMap<CreateSaleDto, Sale>()
                 .ForMember(d => d.Product, opt => opt.MapFrom(p => p));
             CreateMap<CreateSaleDto, Product>();
+            CreateMap<SaleDto, SalesCreated>();
         }
     }
 }
