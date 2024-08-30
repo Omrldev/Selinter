@@ -2,6 +2,7 @@ using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Polly;
 using Polly.Extensions.Http;
+using SalesService.Consumers;
 using SalesService.Data;
 using SalesService.Data.DbContexts;
 using System.Net;
@@ -27,6 +28,9 @@ builder.Services.AddMassTransit(x =>
         opt.UsePostgres();
         opt.UseBusOutbox();
     });
+
+    x.AddConsumersFromNamespaceContaining<SalesCreatedFaultConsumer>();
+    x.SetEndpointNameFormatter(new KebabCaseEndpointNameFormatter("sales", false));
 
     x.UsingRabbitMq((context, config) =>
     {

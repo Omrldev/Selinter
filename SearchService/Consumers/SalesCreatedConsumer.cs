@@ -21,6 +21,11 @@ namespace SearchService.Consumers
 
             var product = _mapper.Map<Product>(context.Message);
 
+            if (product.Brand == "anonymous")
+            {
+                throw new ArgumentException("Can not named a brand anonymous");
+            }
+
             await product.SaveAsync();
         }
     }
