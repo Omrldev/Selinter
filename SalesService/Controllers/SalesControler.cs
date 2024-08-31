@@ -114,6 +114,8 @@ namespace SalesService.Controllers
             sale.Product.Image = updateSaleDto.Image ?? sale.Product.Image;
             sale.Price = updateSaleDto.Price ?? sale.Price;
 
+            await _publishEndpoint.Publish(_mapper.Map<SalesUpdated>(sale));
+
             var result = await _context.SaveChangesAsync() > 0;
 
             if(!result)
