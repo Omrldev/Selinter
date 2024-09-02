@@ -140,6 +140,8 @@ namespace SalesService.Controllers
 
             Entities.Remove(sale);
 
+            await _publishEndpoint.Publish<SalesDeleted>(new { Id = sale.Id.ToString() });
+
             var result = await _context.SaveChangesAsync() > 0;
 
             if (!result)

@@ -15,6 +15,8 @@ namespace SalesService.RequestHelpers
                 .ForMember(d => d.Product, opt => opt.MapFrom(p => p));
             CreateMap<CreateSaleDto, Product>();
             CreateMap<SaleDto, SalesCreated>();
+            CreateMap<Sale, SalesUpdated>().IncludeMembers(x => x.Product);
+            CreateMap<Product, SalesUpdated>();
         }
     }
 }

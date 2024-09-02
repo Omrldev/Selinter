@@ -2,8 +2,8 @@ services:
   salesservice:
     image: ${DOCKER_REGISTRY-}salesservice
     build:
-      context: .
-      dockerfile: SalesService/Dockerfile
+     context: .
+     dockerfile: SalesService/Dockerfile
 
   postgres:
     image: postgres
