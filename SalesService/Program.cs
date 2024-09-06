@@ -1,4 +1,5 @@
 using MassTransit;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Polly;
 using Polly.Extensions.Http;
@@ -38,10 +39,20 @@ builder.Services.AddMassTransit(x =>
     });
 });
 
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(opt =>
+    {
+        opt.Authority = builder.Configuration["IndentityServiceUrl"];
+        opt.RequireHttpsMetadata = false;
+        opt.TokenValidationParameters.ValidateAudience = false;
+        opt.TokenValidationParameters.NameClaimType = "username";
+    });
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
