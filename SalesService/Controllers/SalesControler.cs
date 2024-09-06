@@ -2,6 +2,7 @@
 using AutoMapper.QueryableExtensions;
 using Contracts;
 using MassTransit;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SalesService.Data.DbContexts;
@@ -68,14 +69,15 @@ namespace SalesService.Controllers
             return _mapper.Map<SaleDto>(sale);
         }
 
+        [Authorize]
         [HttpPost]
         public async Task<ActionResult<SaleDto>> CreateSales(CreateSaleDto createSaleDto)
         {
             var sale = _mapper.Map<Sale>(createSaleDto);
 
             // TODO: add current user as seller
-            sale.Seller = "test";
-
+            sale.Seller = User.Identity.Name;
+            #region
             Entities.Add(sale);
 
             var newSale = _mapper.Map<SaleDto>(sale);
@@ -90,8 +92,10 @@ namespace SalesService.Controllers
             }
 
             return CreatedAtAction(nameof(GetSalesById), new {sale.Id}, newSale);
+            #endregion
         }
 
+        [Authorize]
         [HttpPut("{id}")]
         public async Task<ActionResult> UpdateSales(Guid id, UpdateSaleDto updateSaleDto)
         {
@@ -105,6 +109,7 @@ namespace SalesService.Controllers
                 }
 
             // TODO: Check seller == user
+            if (sale.Seller != User.Identity.Name) return Forbid();
 
             sale.Product.Title = updateSaleDto.Title ?? sale.Product.Title;
             sale.Product.Description = updateSaleDto.Description ?? sale.Product.Description;
@@ -126,6 +131,7 @@ namespace SalesService.Controllers
             return Ok();
         }
 
+        [Authorize]
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteSales(Guid id)
         {
@@ -137,6 +143,7 @@ namespace SalesService.Controllers
             }
 
             // TODO: check selle == username
+            if (sale.Seller != User.Identity.Name) return Forbid();
 
             Entities.Remove(sale);
 
