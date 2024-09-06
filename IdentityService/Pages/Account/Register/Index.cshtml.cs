@@ -50,10 +50,15 @@ namespace IdentityService.Pages.Account.Register
                 var result = await _userManager.CreateAsync(user, Input.Password);
                 if (result.Succeeded)
                 {
-                    await _userManager.AddClaimsAsync(user, new Claim[]
+                    /*await _userManager.AddClaimsAsync(user, new Claim[]
                     {
                         new Claim(JwtClaimTypes.Name, Input.FullName)
-                    });
+                    });*/
+                    await _userManager.AddClaimsAsync(user,
+                        [
+                            new Claim(JwtClaimTypes.Name, Input.FullName)
+                        ]);
+
                     RegisterSuccess = true;
                 }
             }

@@ -12,17 +12,24 @@ namespace IdentityService
             };
 
         public static IEnumerable<ApiScope> ApiScopes =>
-            new ApiScope[]
-            {
-                new ApiScope("scope1"),
-                new ApiScope("scope2"),
-            };
+            [
+                new ApiScope("salesApp", "Sales app full access")
+            ];
 
         public static IEnumerable<Client> Clients =>
-            new Client[]
-            {
-                // m2m client credentials flow client
-                new Client
+            [
+                new Client 
+                {
+                    ClientId = "postman",
+                    ClientName = "Postman",
+                    AllowedScopes = {"openid", "profile", "salesApp"},
+                    RedirectUris = {"https://www.getpostman.com/oauth2/callback"},
+                    ClientSecrets = [new Secret("NotASecret".Sha256())],
+                    AllowedGrantTypes = {GrantType.ResourceOwnerPassword}
+                }
+
+                // m2m machine to machine client credentials flow client
+                /*new Client
                 {
                     ClientId = "m2m.client",
                     ClientName = "Client Credentials Client",
@@ -47,7 +54,7 @@ namespace IdentityService
 
                     AllowOfflineAccess = true,
                     AllowedScopes = { "openid", "profile", "scope2" }
-                },
-            };
+                },*/
+            ];
     }
 }
